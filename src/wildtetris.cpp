@@ -9,7 +9,7 @@ int main(const int argc, const char** args) {
     Tetromino* container = {};
     Board board = Board(container, 20);
 
-    board.store_tetromino(0, 0, 'T', 0);
+    board.store_tetromino(0, 0, 'L', 0);
     board.print();
 
     return 0;

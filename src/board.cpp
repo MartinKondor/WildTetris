@@ -22,25 +22,32 @@ void Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90
     Tetromino t = Tetromino(shape_type);
     t.rotate(n_of_90_degree_rotation);
 
-    t.print();
-
+    /**
+     * Get the first filled x and y coordinates
+     */
     int first_filled_x = 5;
     int first_filled_y = 5;
 
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
-            if (t.pixels[i][j] != 0) {
-                if (first_filled_x > i) {
-                    first_filled_x = i;
+            if (t.pixels[i][j] == 1) {
+                if (first_filled_y > i) {
+                    first_filled_y = i;
                 }
-                if (first_filled_y > j) {
-                    first_filled_y = j;
-                }
+                if (first_filled_x > j) {
+                    first_filled_x = j;
+                }           
             }
         }
     }
 
-    std::cout << first_filled_x << " " << first_filled_y << std::endl;
+    for (int i = first_filled_x; i < 5 - first_filled_x; i++) {
+        for (int j = first_filled_y; j < 5 - first_filled_y; j++) {
+            if (t.pixels[i][j] == 1) {
+                this->board[xcoord + i - first_filled_x][ycoord + j - first_filled_y] = 1;
+            }
+        }
+    }
 }
 
 void Board::delete_possible_lines() {
