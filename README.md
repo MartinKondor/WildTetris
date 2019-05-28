@@ -13,7 +13,7 @@ make build
 Run 
 
 ```shell
-./bin/wt.exe
+./bin/wildtetris.exe
 ```
 
 ## Structure

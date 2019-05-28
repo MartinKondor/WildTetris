@@ -1,12 +1,11 @@
 
 build:
-    echo build 
-
-
+	@g++ src/wildtetris.cpp -Iheaders -std=c++17 -o bin/wildtetris.exe
+	
 runtest:
-    echo runtest
-    
+	@g++ src/wildtetris.cpp -Iheaders -std=c++17 -o bin/wildtetris.exe
+	@bin/wildtetris.exe
 
 test:
-    echo test
-    
+	@g++ tests/wildtetris.cpp -Iheaders -std=c++17 -o bin/tests.exe
+	@bin/tests.exe
