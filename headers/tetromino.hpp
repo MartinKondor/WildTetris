@@ -11,6 +11,9 @@ shapes or "tetromino"s:
 Also the object itself contains the rotation of the Tetromino.
 
 ---------------------------------------------------------------*/
+#ifndef _TETROMINO_
+#define _TETROMINO_
+
 
 class Tetromino {
     public:
@@ -28,6 +31,8 @@ class Tetromino {
      */
     int rotation;
     char shape_type;
+    int xpos;
+    int ypos;
         
     Tetromino(char shape_type);
 
@@ -37,3 +42,5 @@ class Tetromino {
     const void rotate(int clockwise_n_of_90);
     const void print();
 };
+
+#endif

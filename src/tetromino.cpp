@@ -1,4 +1,3 @@
-#include <iostream>
 #include "tetromino.hpp"
 
 
@@ -42,6 +41,8 @@ Tetromino::Tetromino(char shape_type)
 {
     this->rotation = 0;
     this->shape_type = shape_type;
+    this->xpos = 0;
+    this->ypos = 0;
 
     switch (shape_type) {
         case 'Z':
