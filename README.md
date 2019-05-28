@@ -28,5 +28,5 @@ tests/  # TDD tests
 Copyright (c) 2019 Martin Kondor.
 All rights reserved.
 
-The repository is licensed under the terms of ```BSD 4-Clause "Original" or "Old" License```.
+The repository is licensed under the terms of ```BSD 3-Clause Clear``` license.
 See the ```LICENSE``` file for more details.
