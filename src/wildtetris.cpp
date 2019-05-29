@@ -28,24 +28,20 @@ int main(const int argc, const char** args) {
         xmove = 0,
         ymove = 1;
 
-    while (iter < 1) {
+    while (iter < 6) {
         // Sleep(500);
 
         board.print();
         cout << endl;
 
-        try {
-            board.update(rotation, xmove, ymove);
+        board.remove_last_line_if_possible();
+        
+        if (!board.is_won()) {
+            cout << "Game over";
+            exit(0);
         }
-        catch (const char* err) {
-            if (err == "out of width" || err == "out of height") {
-                board.restore_board();  // abord changes on the board
-                board.throw_new_tetromino();
-            }
-            else {
-                cout << "Error: " << err << endl;
-            }
-        }
+
+        board.update(rotation, xmove, ymove);
         iter++;
     }
 

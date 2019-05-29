@@ -34,32 +34,26 @@ void Board::restore_board() {
     }
 }
 
-int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation) throw (const char*) {
-    if (!this->is_free_block(xcoord, ycoord)) {
+int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation) {
+    if (!this->is_free_block(xcoord, ycoord, -1)) {
         std::cout << "(" << ycoord << ", " << xcoord << ") is not a free position" << std::endl;
-        exit(1);
+        //exit(1);
     }
 
     // creating and rotating tetromino object
     Tetromino t = Tetromino(shape_type, xcoord, ycoord, this->get_new_tetromino_id());
     t.rotate(n_of_90_degree_rotation);
 
-    try {
-        this->draw_tetromino(xcoord, ycoord, t);
-    }
-    catch (const char* err) {
-        throw err;
-    }
-
+    this->draw_tetromino(xcoord, ycoord, t);
     this->tetrominos.push_back(t);
     return t.id;
 }
 
-void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) throw (const char*) {
+void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) {
     Pair pads = t.get_paddings();
 
-    int xpad = pads.pair[0],
-        ypad = pads.pair[1];
+    int xpad = pads[0],
+        ypad = pads[1];
 
     for (int i = 0; i < 5; i++) {  // place tetromino to the board
         for (int j = 0; j < 5; j++) {
@@ -67,41 +61,33 @@ void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) throw (const ch
                 int newx = xcoord + j - xpad,
                     newy = ycoord + i - ypad;
 
-                bool is_free_b = false;
-                try {
-                    is_free_b = this->is_free_block(newx, newy);
-                }
-                catch (const char* err) {
-                    throw err;
-                }
+                bool is_free_b = is_free_b = this->is_free_block(newx, newy, t.id);
 
                 if (is_free_b) {
                     this->board[newy][newx] = 1;
                 }
+
             }
         }
     }
+
 }
 
-bool Board::is_free_block(int xcoord, int ycoord) throw (const char*) {
-    if (xcoord >= BOARD_WIDTH) {
-        throw "out of width";
-    }
-    if (ycoord >= BOARD_HEIGHT) {
-        throw "out of height";
-    }
+bool Board::is_free_block(int xcoord, int ycoord, int tetromino_id) {
+    if (this->board[ycoord][xcoord] == 1 ||
+        xcoord >= BOARD_WIDTH ||
+        ycoord >= BOARD_HEIGHT) {
 
-    // collusion detection
-    try {
-        Tetromino current_tetromino = this->tetrominos.at(this->current_tetromino_id);
-        cout << endl;
+        if (this->current_tetromino_id != tetromino_id && this->board[ycoord][xcoord] == 0) {
+            return true;
+        }
 
-        // find the coordinates to "current_tetromino"'s 1s and check if they are free or not
-        // TODO
+        this->restore_board();  // abord changes on the board
+        this->throw_new_tetromino();  // throw a new playable tetromino
+
+        return false;
     }
-    catch (const std::out_of_range& oor) {}
-
-    return this->board[ycoord][xcoord] == 0;
+    return true;
 }
 
 
@@ -140,21 +126,74 @@ void Board::update(int rotation, int xmove, int ymove) {
     this->clean_up();
 
     for (int i = 0; i < this->tetrominos.size(); i++) {
-        if (this->current_tetromino_id == this->tetrominos[i].id) {
-            this->tetrominos[i].xpos += xmove;
-            this->tetrominos[i].ypos += ymove;
-            this->tetrominos[i].rotate(rotation);
-            this->draw_tetromino(this->tetrominos[i].xpos, this->tetrominos[i].ypos, this->tetrominos[i]);
-        } else {
+        if (this->current_tetromino_id != this->tetrominos[i].id) {
             this->draw_tetromino(this->tetrominos[i].xpos, this->tetrominos[i].ypos, this->tetrominos[i]);
         }
     }
+    
+    try {
+        Tetromino &current = this->tetrominos.at(this->current_tetromino_id);
+        current.xpos += xmove;
+        current.ypos += ymove;
+        current.rotate(rotation);
+        this->draw_tetromino(current.xpos, current.ypos, current);
+    }
+    catch (const std::out_of_range &oor) {}
 }
 
 void Board::throw_new_tetromino() {
     // choose a random shape with random rotation
+    /*
     srand(time(NULL));
     int id = this->store_tetromino(1, 0, SHAPE_TYPES[rand() % 5], rand() % 4);
-
+    */
+    int id = this->store_tetromino(0, 0, 'I', 0);
     this->current_tetromino_id = id;
+}
+
+void Board::remove_last_line_if_possible() {
+    for (int i = 0; i < BOARD_WIDTH; i++) {
+        if (this->board[BOARD_HEIGHT - 1][i] == 0) {
+            return;
+        }
+    }
+
+    // remove last line
+    this->save_board();
+    this->clean_up();
+
+    for (int i = 1; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            this->board[i][j] = this->prev_board[i - 1][j];
+        }
+    }
+
+    try {
+        this->tetrominos[this->current_tetromino_id].ypos++;
+    }
+    catch (const std::out_of_range &oor) {}
+}
+
+bool Board::is_won() {
+    // collect the filled columns
+    bool is_there_a_filled_column = false;
+
+    for (int j = 0; j < BOARD_WIDTH; j++) {
+        int sum = 0;
+        
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            sum += this->board[i][j];
+        }
+
+        if (sum == BOARD_HEIGHT) {
+            is_there_a_filled_column = true;
+            break;
+        } 
+    }
+
+    if (is_there_a_filled_column) {
+        return false;
+    }
+
+    return true;
 }

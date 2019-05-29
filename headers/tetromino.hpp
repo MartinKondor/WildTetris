@@ -49,7 +49,6 @@ class Tetromino {
     * Retrun an array with the x and y paddings to the first 1
     */
     Pair get_paddings();
-    std::vector<Pair> get_filled_coordinates();
 };
 
 #endif
