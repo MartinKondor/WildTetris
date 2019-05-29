@@ -1,11 +1,11 @@
+CC=g++
+SOURCE=src/wildtetris.cpp
+FLAGS= -std=c++17 -I"headers"
+EXE=bin/wildtetris.exe
 
 build:
-	@g++ src/wildtetris.cpp -Iheaders -std=c++17 -o bin/wildtetris.exe
+	@$(CC) $(SOURCE) $(FLAGS) -o $(EXE)
 	
 runtest:
-	@g++ src/wildtetris.cpp -Iheaders -std=c++17 -o bin/wildtetris.exe
-	@bin/wildtetris.exe
-
-test:
-	@g++ tests/wildtetris.cpp -Iheaders -std=c++17 -o bin/tests.exe
-	@bin/tests.exe
+	$(build)
+	@$(EXE)

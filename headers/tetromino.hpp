@@ -16,8 +16,7 @@ Also the object itself contains the rotation of the Tetromino.
 
 const char SHAPE_TYPES[5] = {'L', 'Z', 'T', 'S', 'I'};
 
-class Tetromino {
-    public:
+class Tetromino { public:
 
     /**
     * Container for the pixels of an element

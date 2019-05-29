@@ -1,7 +1,5 @@
 #include "board.hpp"
 
-using std::cout;
-using std::endl;
 
 Board::Board() {
     this->tetrominos = {};

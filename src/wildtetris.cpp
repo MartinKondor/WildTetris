@@ -3,7 +3,6 @@
 #include <vector>
 #include <stdexcept>
 #include <time.h>
-// #include <windows.h>
 
 struct Pair {
     int pair[2];
@@ -14,8 +13,11 @@ struct Pair {
 
 #include "tetromino.cpp"
 #include "board.cpp"
+#include "game.cpp"
 
-using namespace std;
+using std::cout;
+using std::endl;
+
 
 int main(const int argc, const char** args) {
     Board board = Board();
@@ -44,6 +46,5 @@ int main(const int argc, const char** args) {
         board.update(rotation, xmove, ymove);
         iter++;
     }
-
     return 0;
 }

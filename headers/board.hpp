@@ -13,8 +13,7 @@ and the collusion detection takes place.
 #define BOARD_WIDTH 3
 
 
-class Board {
-    public:
+class Board { public:
     std::vector<Tetromino> tetrominos;
     std::vector<Tetromino> prev_tetrominos;
     int prev_board[BOARD_HEIGHT][BOARD_WIDTH];
