@@ -1,10 +1,15 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
-#include <windows.h>
+#include <stdexcept>
+#include <time.h>
+// #include <windows.h>
 
 struct Pair {
     int pair[2];
+    const int operator[](const int index) {
+        return pair[index];
+    }
 };
 
 #include "tetromino.cpp"
@@ -15,14 +20,16 @@ using namespace std;
 int main(const int argc, const char** args) {
     Board board = Board();
 
+    // throw the first tetromino
     board.throw_new_tetromino();
+
     int iter = 0,
         rotation = 0,
         xmove = 0,
         ymove = 1;
 
-    while (iter < 12) {
-        Sleep(500);
+    while (iter < 1) {
+        // Sleep(500);
 
         board.print();
         cout << endl;
@@ -32,7 +39,7 @@ int main(const int argc, const char** args) {
         }
         catch (const char* err) {
             if (err == "out of width" || err == "out of height") {
-                board.restore_board();
+                board.restore_board();  // abord changes on the board
                 board.throw_new_tetromino();
             }
             else {

@@ -35,6 +35,7 @@ class Tetromino {
     int xpos;
     int ypos;
     int id;
+    std::vector<Pair> filled_coordinates;
 
     Tetromino(char shape_type, int xpos, int ypos, int id);
 
@@ -48,6 +49,7 @@ class Tetromino {
     * Retrun an array with the x and y paddings to the first 1
     */
     Pair get_paddings();
+    std::vector<Pair> get_filled_coordinates();
 };
 
 #endif

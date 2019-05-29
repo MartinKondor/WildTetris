@@ -62,7 +62,7 @@ class Board {
     * Seaches for and retruns the given id'd tetromino
     */
     Tetromino get_tetromino_by_id(int id);
-    void draw_tetromino(int xcoord, int ycoord, Tetromino t) throw (const char*);
+    void draw_tetromino(int xcoord, int ycoord, Tetromino &t) throw (const char*);
     void throw_new_tetromino();
     void save_board();
     void restore_board();

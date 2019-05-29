@@ -55,8 +55,9 @@ int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_
     return t.id;
 }
 
-void Board::draw_tetromino(int xcoord, int ycoord, Tetromino t) throw (const char*) {
+void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) throw (const char*) {
     Pair pads = t.get_paddings();
+
     int xpad = pads.pair[0],
         ypad = pads.pair[1];
 
@@ -71,14 +72,12 @@ void Board::draw_tetromino(int xcoord, int ycoord, Tetromino t) throw (const cha
                     is_free_b = this->is_free_block(newx, newy);
                 }
                 catch (const char* err) {
-                    // this->update(0, 0, 0);  // abort changes on the board
                     throw err;
                 }
 
                 if (is_free_b) {
                     this->board[newy][newx] = 1;
                 }
-
             }
         }
     }
@@ -91,6 +90,17 @@ bool Board::is_free_block(int xcoord, int ycoord) throw (const char*) {
     if (ycoord >= BOARD_HEIGHT) {
         throw "out of height";
     }
+
+    // collusion detection
+    try {
+        Tetromino current_tetromino = this->tetrominos.at(this->current_tetromino_id);
+        cout << endl;
+
+        // find the coordinates to "current_tetromino"'s 1s and check if they are free or not
+        // TODO
+    }
+    catch (const std::out_of_range& oor) {}
+
     return this->board[ycoord][xcoord] == 0;
 }
 
@@ -106,7 +116,7 @@ void Board::clean_up() {
 void Board::print() {
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
-            std::cout << this->board[i][j] << ", ";
+            std::cout << this->board[i][j] << "  ";
         }
         std::cout << std::endl;
     }
@@ -142,9 +152,9 @@ void Board::update(int rotation, int xmove, int ymove) {
 }
 
 void Board::throw_new_tetromino() {
-    // choose a random shape
-    // TODO
+    // choose a random shape with random rotation
+    srand(time(NULL));
+    int id = this->store_tetromino(1, 0, SHAPE_TYPES[rand() % 5], rand() % 4);
 
-    int id = this->store_tetromino(0, 0, 'S', 0);
     this->current_tetromino_id = id;
 }

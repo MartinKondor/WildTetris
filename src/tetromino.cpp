@@ -74,6 +74,8 @@ Tetromino::Tetromino(char shape_type, int xpos, int ypos, int id)
             exit(1);
             break;
     }
+
+    this->filled_coordinates = get_filled_coordinates();
 }
 
 void Tetromino::rotate(int clockwise_n_of_90) {
@@ -118,4 +120,18 @@ Pair Tetromino::get_paddings() {
         }
     }
     return pads;
+}
+
+std::vector<Pair> Tetromino::get_filled_coordinates() {
+    std::vector<Pair> pairs = {};
+
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (this->pixels[i][j] == 1) {
+                Pair p = {i, j};
+                pairs.push_back(p);
+            }
+        }
+    }
+    return pairs;
 }
