@@ -9,25 +9,56 @@ and the collusion detection takes place.
 
 #include "tetromino.hpp"
 
-#define BOARD_HEIGHT 20  // in blocks
-#define BOARD_WIDTH 10
+#define BOARD_HEIGHT 11  // in blocks
+#define BOARD_WIDTH 7
 
 
 class Board {
     public:
-    Board(Tetromino* shapes, int screen_height);
+    std::vector<Tetromino> tetrominos;
+    int board[BOARD_HEIGHT][BOARD_WIDTH];
+    int tetromino_id;
+
+    /**
+    * The active or falling tetroino's id
+    */
+    int current_tetromino_id;
+
+    Board();
+    
+    /**
+    * Determine if the block is free from tetrominos
+    */
     bool is_free_block(int xcoord, int ycoord);
+    
+    /**
+     * Place tetromino to the board from it's first filled element
+     *
+     * xcoord - Horizontal position in blocks
+     * ycoord - Vertical position in blocks
+     *
+     * The x, y coordinate center is (0, 0) the left upper
+     * corner of the this->board matrix
+     */
     void store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation);
-    void delete_possible_lines();
-    bool is_game_over();
     void print();
 
-    private:
-    int board[BOARD_WIDTH][BOARD_HEIGHT];
-    int screen_height;
-    Tetromino* tetrominos;
-
+    /**
+    * Fills the board with 0s
+    */
     void clean_up();
+    int get_new_tetromino_id();
+
+    /**
+    * This is where the current tetromnio starts to fall
+    */
+    void update(int rotation, int xmove, int ymove);
+
+    /**
+    * Seaches for and retruns the given id'd tetromino
+    */
+    Tetromino get_tetromino_by_id(int id);
+    void draw_tetromino(int xcoord, int ycoord, Tetromino t);
 };
 
 #endif

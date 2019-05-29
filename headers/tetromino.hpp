@@ -33,14 +33,20 @@ class Tetromino {
     char shape_type;
     int xpos;
     int ypos;
-        
-    Tetromino(char shape_type);
+    int id;
+
+    Tetromino(char shape_type, int xpos, int ypos, int id);
 
     /**
      * Rotate the pixels array to the given degree
      */
-    const void rotate(int clockwise_n_of_90);
-    const void print();
+    void rotate(int clockwise_n_of_90);
+    void print();
+
+    /**
+    * Retrun an array with the x and y paddings to the first 1
+    */
+    Pair get_paddings();
 };
 
 #endif

@@ -1,80 +1,104 @@
 #include "board.hpp"
 
 
-Board::Board(Tetromino* tetrominos, int screen_height) {
-    this->screen_height = screen_height;
-    this->tetrominos = tetrominos;
+Board::Board() {
+    this->tetrominos = {};
+    this->tetromino_id = 0;
+    this->current_tetromino_id = 0;
     this->clean_up();
 }
 
-bool Board::is_free_block(int xcoord, int ycoord) {
-    return true;
-}
-
-
-/**
- * Place tetromino to the board from it's first filled element
- * 
- * xcoord - Horizontal position in blocks
- * ycoord - Vertical position in blocks
- */
 void Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation) {
-    Tetromino t = Tetromino(shape_type);
+    if (!this->is_free_block(xcoord, ycoord)) {
+        std::cout << "(" << ycoord << ", " << xcoord << ") is not a free position" << std::endl;
+        exit(1);
+    }
+
+    // creating and rotating tetromino object
+    Tetromino t = Tetromino(shape_type, xcoord, ycoord, this->get_new_tetromino_id());
     t.rotate(n_of_90_degree_rotation);
 
-    /**
-     * Get the first filled x and y coordinates
-     */
-    int first_filled_x = 5;
-    int first_filled_y = 5;
+    this->draw_tetromino(xcoord, ycoord, t);
 
-    for (int i = 0; i < 5; i++) {
+    this->tetrominos.push_back(t);
+    this->current_tetromino_id = t.id;
+}
+
+void Board::draw_tetromino(int xcoord, int ycoord, Tetromino t) {
+    Pair pads = t.get_paddings();
+    int xpad = pads.pair[0],
+        ypad = pads.pair[1];
+
+    for (int i = 0; i < 5; i++) {  // place tetromino to the board
         for (int j = 0; j < 5; j++) {
             if (t.pixels[i][j] == 1) {
-                if (first_filled_y > i) {
-                    first_filled_y = i;
+                int newx = xcoord + j - xpad,
+                    newy = ycoord + i - ypad;
+
+                if (!this->is_free_block(newx, newy)) {
+                    std::cout << "(" << newy << ", " << newx << ") is not a free position" << std::endl;
+                    exit(1);
                 }
-                if (first_filled_x > j) {
-                    first_filled_x = j;
-                }           
-            }
-        }
-    }
-
-    for (int i = first_filled_x; i < 5 - first_filled_x; i++) {
-        for (int j = first_filled_y; j < 5 - first_filled_y; j++) {
-            if (t.pixels[i][j] == 1) {
-                this->board[xcoord + i - first_filled_x][ycoord + j - first_filled_y] = 1;
+                this->board[newy][newx] = 1;
             }
         }
     }
 }
 
-void Board::delete_possible_lines() {
-    
+bool Board::is_free_block(int xcoord, int ycoord) {
+    if (xcoord > BOARD_WIDTH || ycoord > BOARD_HEIGHT) {
+        std::cout << "(" << xcoord << ", " << ycoord << ") invalid position, cannot fit to the table" << std::endl;
+        exit(1);
+    }
+    return this->board[ycoord][xcoord] == 0;
 }
 
-bool Board::is_game_over() {
-    return false;
-}
 
-/**
- * Fills the board with 0s
- */
 void Board::clean_up() {
-    // Fill the board with free positions
-    for (int i = 0; i < BOARD_WIDTH; i++) {
-        for (int j = 0; j < BOARD_HEIGHT; j++) {
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
             this->board[i][j] = 0;
         }
     }
 }
 
 void Board::print() {
-    for (int i = 0; i < BOARD_WIDTH; i++) {
-        for (int j = 0; j < BOARD_HEIGHT; j++) {
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
             std::cout << this->board[i][j] << ", ";
         }
         std::cout << std::endl;
+    }
+}
+
+int Board::get_new_tetromino_id() {
+    return this->tetromino_id++;
+}
+
+Tetromino Board::get_tetromino_by_id(int id) {
+    for (int i = 0; i < this->tetrominos.size(); i++) {
+        if (this->tetrominos[i].id == id) {
+            return this->tetrominos[i];
+        }
+    }
+    return Tetromino('Q', -1, -1, -1);
+}
+
+void Board::update(int rotation, int xmove, int ymove) {
+    if (rotation == 0 && xmove == 0 && ymove == 0) {
+        return;
+    }
+
+    this->clean_up();
+
+    for (int i = 0; i < this->tetrominos.size(); i++) {
+        if (this->current_tetromino_id == i) {
+            this->tetrominos[i].xpos += xmove;
+            this->tetrominos[i].ypos += ymove;
+            this->tetrominos[i].rotate(rotation);
+            this->draw_tetromino(this->tetrominos[i].xpos, this->tetrominos[i].ypos, this->tetrominos[i]);
+        } else {
+            this->draw_tetromino(this->tetrominos[i].xpos, this->tetrominos[i].ypos, this->tetrominos[i]);
+        }
     }
 }

@@ -3,11 +3,7 @@
 
 /**
  * An Inplace function to rotate a NxN matrix 
- * by 90 degrees in anti-clockwise direction 
- * 
- * Worst case: O(n^2)
- * compared to the "reverse_rows(transpose(Array))"
- * method (O(n^2 + n)), it's faster
+ * by 90 degrees in anti-clockwise direction
  */
 const void rotate_matrix(int mat[5][5]) {
     for (int x = 0; x < 5 / 2; x++) {
@@ -24,15 +20,12 @@ const void rotate_matrix(int mat[5][5]) {
             mat[5 - 1 - x][5 - 1 - y] = mat[5 - 1 - y][x]; 
   
             // assign temp to left 
-            mat[5 - 1 - y][x] = temp; 
+            mat[5 - 1 - y][x] = temp;
         } 
-    } 
+    }
 } 
 
-
-
-// Constructor
-Tetromino::Tetromino(char shape_type)
+Tetromino::Tetromino(char shape_type, int xpos, int ypos, int id)
 : pixels {{0, 0, 0, 0, 0},
           {0, 0, 0, 0, 0},
           {0, 0, 0, 0, 0},
@@ -41,8 +34,9 @@ Tetromino::Tetromino(char shape_type)
 {
     this->rotation = 0;
     this->shape_type = shape_type;
-    this->xpos = 0;
-    this->ypos = 0;
+    this->xpos = xpos;
+    this->ypos = ypos;
+    this->id = id;
 
     switch (shape_type) {
         case 'Z':
@@ -83,18 +77,20 @@ Tetromino::Tetromino(char shape_type)
     }
 }
 
-const void Tetromino::rotate(int clockwise_n_of_90) {
+void Tetromino::rotate(int clockwise_n_of_90) {
     if (clockwise_n_of_90 >= 0 && clockwise_n_of_90 <= 4) {
         for (int i = 0; i < clockwise_n_of_90; i++) {
             rotate_matrix(this->pixels);
         }
+
+        this->rotation = clockwise_n_of_90;
     } else {
         std::cout << "cannot rotate matrix by " << clockwise_n_of_90*90 << " degree" << std::endl;
         exit(1);
     }
 }
 
-const void Tetromino::print() {
+void Tetromino::print() {
     std::cout << "Shape: " << this->shape_type << std::endl;
     std::cout << "Rotation: " << this->rotation*90 << std::endl;
     std::cout << std::endl;
@@ -105,4 +101,22 @@ const void Tetromino::print() {
         }
         std::cout << std::endl;
     }
+}
+
+Pair Tetromino::get_paddings() {
+    Pair pads = {5, 5};
+
+    for (int i = 0; i < 5; i++) {  // find the first 1s in the tetromino
+        for (int j = 0; j < 5; j++) {
+            if (this->pixels[i][j] == 1) {
+                if (pads.pair[1] > i) {
+                    pads.pair[1] = i;
+                }
+                if (pads.pair[0] > j) {
+                    pads.pair[0] = j;
+                }
+            }
+        }
+    }
+    return pads;
 }
