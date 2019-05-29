@@ -14,6 +14,7 @@ Also the object itself contains the rotation of the Tetromino.
 #ifndef _TETROMINO_
 #define _TETROMINO_
 
+const char SHAPE_TYPES[5] = {'L', 'Z', 'T', 'S', 'I'};
 
 class Tetromino {
     public:

@@ -69,7 +69,6 @@ Tetromino::Tetromino(char shape_type, int xpos, int ypos, int id)
             pixels[3][2] = 1;
             pixels[3][3] = 1;
             break;
-    
         default:
             std::cout << "'" << shape_type << "' shape cannot be inicialized" << std::endl;
             exit(1);

@@ -1,14 +1,40 @@
 #include "board.hpp"
 
+using std::cout;
+using std::endl;
 
 Board::Board() {
     this->tetrominos = {};
     this->tetromino_id = 0;
     this->current_tetromino_id = 0;
-    this->clean_up();
+
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            this->board[i][j] = 0;
+            this->prev_board[i][j] = 0;
+        }
+    }
 }
 
-void Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation) {
+void Board::save_board() {
+    this->prev_tetrominos = this->tetrominos;
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            this->prev_board[i][j] = this->board[i][j];
+        }
+    }
+}
+
+void Board::restore_board() {
+    this->tetrominos = this->prev_tetrominos;
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            this->board[i][j] = this->prev_board[i][j];
+        }
+    }
+}
+
+int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation) throw (const char*) {
     if (!this->is_free_block(xcoord, ycoord)) {
         std::cout << "(" << ycoord << ", " << xcoord << ") is not a free position" << std::endl;
         exit(1);
@@ -18,13 +44,18 @@ void Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90
     Tetromino t = Tetromino(shape_type, xcoord, ycoord, this->get_new_tetromino_id());
     t.rotate(n_of_90_degree_rotation);
 
-    this->draw_tetromino(xcoord, ycoord, t);
+    try {
+        this->draw_tetromino(xcoord, ycoord, t);
+    }
+    catch (const char* err) {
+        throw err;
+    }
 
     this->tetrominos.push_back(t);
-    this->current_tetromino_id = t.id;
+    return t.id;
 }
 
-void Board::draw_tetromino(int xcoord, int ycoord, Tetromino t) {
+void Board::draw_tetromino(int xcoord, int ycoord, Tetromino t) throw (const char*) {
     Pair pads = t.get_paddings();
     int xpad = pads.pair[0],
         ypad = pads.pair[1];
@@ -35,20 +66,30 @@ void Board::draw_tetromino(int xcoord, int ycoord, Tetromino t) {
                 int newx = xcoord + j - xpad,
                     newy = ycoord + i - ypad;
 
-                if (!this->is_free_block(newx, newy)) {
-                    std::cout << "(" << newy << ", " << newx << ") is not a free position" << std::endl;
-                    exit(1);
+                bool is_free_b = false;
+                try {
+                    is_free_b = this->is_free_block(newx, newy);
                 }
-                this->board[newy][newx] = 1;
+                catch (const char* err) {
+                    // this->update(0, 0, 0);  // abort changes on the board
+                    throw err;
+                }
+
+                if (is_free_b) {
+                    this->board[newy][newx] = 1;
+                }
+
             }
         }
     }
 }
 
-bool Board::is_free_block(int xcoord, int ycoord) {
-    if (xcoord > BOARD_WIDTH || ycoord > BOARD_HEIGHT) {
-        std::cout << "(" << xcoord << ", " << ycoord << ") invalid position, cannot fit to the table" << std::endl;
-        exit(1);
+bool Board::is_free_block(int xcoord, int ycoord) throw (const char*) {
+    if (xcoord >= BOARD_WIDTH) {
+        throw "out of width";
+    }
+    if (ycoord >= BOARD_HEIGHT) {
+        throw "out of height";
     }
     return this->board[ycoord][xcoord] == 0;
 }
@@ -85,14 +126,11 @@ Tetromino Board::get_tetromino_by_id(int id) {
 }
 
 void Board::update(int rotation, int xmove, int ymove) {
-    if (rotation == 0 && xmove == 0 && ymove == 0) {
-        return;
-    }
-
+    this->save_board();
     this->clean_up();
 
     for (int i = 0; i < this->tetrominos.size(); i++) {
-        if (this->current_tetromino_id == i) {
+        if (this->current_tetromino_id == this->tetrominos[i].id) {
             this->tetrominos[i].xpos += xmove;
             this->tetrominos[i].ypos += ymove;
             this->tetrominos[i].rotate(rotation);
@@ -101,4 +139,12 @@ void Board::update(int rotation, int xmove, int ymove) {
             this->draw_tetromino(this->tetrominos[i].xpos, this->tetrominos[i].ypos, this->tetrominos[i]);
         }
     }
+}
+
+void Board::throw_new_tetromino() {
+    // choose a random shape
+    // TODO
+
+    int id = this->store_tetromino(0, 0, 'S', 0);
+    this->current_tetromino_id = id;
 }

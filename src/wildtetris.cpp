@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
-// #include <windows.h>
+#include <windows.h>
 
 struct Pair {
     int pair[2];
@@ -15,12 +15,32 @@ using namespace std;
 int main(const int argc, const char** args) {
     Board board = Board();
 
-    // padding to the center of the board
-    int xpad_to_center = BOARD_WIDTH / 2;
+    board.throw_new_tetromino();
+    int iter = 0,
+        rotation = 0,
+        xmove = 0,
+        ymove = 1;
 
-    board.store_tetromino(0, 0, 'L', 0);
-    board.update(2, 0, 1);
-    board.print();
+    while (iter < 12) {
+        Sleep(500);
+
+        board.print();
+        cout << endl;
+
+        try {
+            board.update(rotation, xmove, ymove);
+        }
+        catch (const char* err) {
+            if (err == "out of width" || err == "out of height") {
+                board.restore_board();
+                board.throw_new_tetromino();
+            }
+            else {
+                cout << "Error: " << err << endl;
+            }
+        }
+        iter++;
+    }
 
     return 0;
 }

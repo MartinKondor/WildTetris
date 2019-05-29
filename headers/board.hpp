@@ -16,6 +16,8 @@ and the collusion detection takes place.
 class Board {
     public:
     std::vector<Tetromino> tetrominos;
+    std::vector<Tetromino> prev_tetrominos;
+    int prev_board[BOARD_HEIGHT][BOARD_WIDTH];
     int board[BOARD_HEIGHT][BOARD_WIDTH];
     int tetromino_id;
 
@@ -29,7 +31,7 @@ class Board {
     /**
     * Determine if the block is free from tetrominos
     */
-    bool is_free_block(int xcoord, int ycoord);
+    bool is_free_block(int xcoord, int ycoord) throw (const char*);
     
     /**
      * Place tetromino to the board from it's first filled element
@@ -39,8 +41,10 @@ class Board {
      *
      * The x, y coordinate center is (0, 0) the left upper
      * corner of the this->board matrix
+     *
+     * returns the tetromino's id
      */
-    void store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation);
+    int store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation) throw (const char*);
     void print();
 
     /**
@@ -58,7 +62,10 @@ class Board {
     * Seaches for and retruns the given id'd tetromino
     */
     Tetromino get_tetromino_by_id(int id);
-    void draw_tetromino(int xcoord, int ycoord, Tetromino t);
+    void draw_tetromino(int xcoord, int ycoord, Tetromino t) throw (const char*);
+    void throw_new_tetromino();
+    void save_board();
+    void restore_board();
 };
 
 #endif
