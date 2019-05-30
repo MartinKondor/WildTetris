@@ -9,8 +9,8 @@ and the collusion detection takes place.
 
 #include "tetromino.hpp"
 
-#define BOARD_HEIGHT 10  // in blocks
-#define BOARD_WIDTH 5
+#define BOARD_HEIGHT 12  // in blocks
+#define BOARD_WIDTH 7
 
 
 class Board { public:
@@ -19,6 +19,8 @@ class Board { public:
     int prev_board[BOARD_HEIGHT][BOARD_WIDTH];
     int board[BOARD_HEIGHT][BOARD_WIDTH];
     int tetromino_id;
+    int score;
+    int game_is_over;
 
     /**
     * The active or falling tetroino's id
@@ -27,6 +29,10 @@ class Board { public:
 
     Board();
     void print();
+
+    /**
+    * Throw a new playable tetromino from the top
+    */
     void throw_new_tetromino();
 
     /**
@@ -45,7 +51,7 @@ class Board { public:
     /**
     * Determine if the block is free from tetrominos
     */
-    bool is_free_block(int xcoord, int ycoord, int tetromino_id);
+    bool is_free_block(int xcoord, int ycoord);
     void restore_board();
 
     /**

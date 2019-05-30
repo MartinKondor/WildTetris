@@ -19,12 +19,38 @@ using std::cout;
 using std::endl;
 
 
-void showinfo() {
+void showinfo(const Board &board) {
     cout << endl;
     cout << "Keys:" << endl;
     cout << "(R)\tRotate" << endl;
     cout << "(E)\tExit" << endl;
     cout << endl;
+    cout << "Score: " << board.score << endl;
+    cout << endl;
+}
+
+int handle_keys(int &xmove, int &ymove, int &rotation) {
+    // rotation key
+    if (GetKeyState('R') & 0x8000) {
+        rotation++;
+    }
+    // exit key
+    if (GetKeyState('E') & 0x8000) {
+        return 1;
+    }
+    if (GetKeyState(VK_DOWN) & 0x8000) {
+        ymove++;
+    }
+    if (GetKeyState(VK_UP) & 0x8000) {
+        ymove--;
+    }
+    if (GetKeyState(VK_LEFT) & 0x8000) {
+        xmove--;
+    }
+    if (GetKeyState(VK_RIGHT) & 0x8000) {
+        xmove++;
+    }
+    return 0;
 }
 
 
@@ -42,7 +68,7 @@ int main(const int argc, const char** args) {
         system("cls");
 
         // showing board and info on screen
-        showinfo();
+        showinfo(board);
         board.print();
 
         // check win conditions
@@ -51,17 +77,11 @@ int main(const int argc, const char** args) {
             exit(0);
         }
 
-        // rotation key
-        if (GetKeyState('R') & 0x8000) {
-            rotation++;
-        }
-
-        // exit key
-        if (GetKeyState('E') & 0x8000) {
+        if (handle_keys(xmove, ymove, rotation) == 1) {
             break;
         }
 
-        board.update(rotation, xmove, ymove);  // fix
+        board.update(rotation, xmove, ymove);
         board.remove_last_line_if_possible();
     }
 

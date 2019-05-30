@@ -5,6 +5,8 @@ Board::Board() {
     this->tetrominos = {};
     this->tetromino_id = 0;
     this->current_tetromino_id = 0;
+    this->score = 0;
+    this->game_is_over = false;
 
     // filling the boards with 0s
     for (int i = 0; i < BOARD_HEIGHT; i++) {
@@ -27,9 +29,17 @@ void Board::throw_new_tetromino() {
 }
 
 int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation) {
-    if (!this->is_free_block(xcoord, ycoord, -1)) {
-        std::cout << "(" << ycoord << ", " << xcoord << ") is not a free position" << std::endl;
-        exit(1);
+    if (!this->is_free_block(xcoord, ycoord)) {
+        // probably it's spawning on filled coordinates
+
+        if (xcoord >= BOARD_WIDTH || ycoord >= BOARD_HEIGHT) {
+            // it's a game over
+            this->game_is_over = true;
+            return -1;
+        }
+
+        // try to spawn somewhere else
+        return this->store_tetromino(xcoord + 1, ycoord, shape_type, rotation);
     }
 
     // creating and rotating tetromino object
@@ -41,37 +51,40 @@ int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation
     return t.id;
 }
 
-bool Board::is_free_block(int xcoord, int ycoord, int tetromino_id) {
+bool Board::is_free_block(int xcoord, int ycoord) {
     if (this->board[ycoord][xcoord] == 1 || xcoord >= BOARD_WIDTH || ycoord >= BOARD_HEIGHT) {
-
-        if (this->current_tetromino_id != tetromino_id && this->board[ycoord][xcoord] == 0) {
-            return true;
-        }
-
-        this->restore_board();  // abord changes on the board
-        this->throw_new_tetromino();  // throw a new playable tetromino
-
         return false;
     }
     return true;
 }
 
-void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) {
-    Pair pads = t.get_paddings();
+void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &tetromino) {
+    Pair pads = tetromino.get_paddings();
 
     int xpad = pads[0],
         ypad = pads[1];
 
     for (int i = 0; i < 5; i++) {  // place tetromino to the board
         for (int j = 0; j < 5; j++) {
-            if (t.pixels[i][j] == 1) {
+            if (tetromino.pixels[i][j] == 1) {
                 int newx = xcoord + j - xpad,
                     newy = ycoord + i - ypad;
 
-                bool is_free_b = is_free_b = this->is_free_block(newx, newy, t.id);
-
-                if (is_free_b) {
+                if (this->is_free_block(newx, newy)) {
                     this->board[newy][newx] = 1;
+                } else {
+                    // allow the non current box to go beyond height
+                    // this occurs when we remove the last line
+                    if (this->current_tetromino_id != tetromino.id) {
+                        continue;
+                    }
+
+                    // abord changes on the board, this way making the current_tetromino
+                    // stop on the bottom or on the top of an other box
+                    this->restore_board();
+
+                    // throw a new playable tetromino
+                    this->throw_new_tetromino();
                 }
 
             }
@@ -80,20 +93,20 @@ void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) {
 
 }
 
-void Board::save_board() {
-    this->prev_tetrominos = this->tetrominos;
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            this->prev_board[i][j] = this->board[i][j];
-        }
-    }
-}
-
 void Board::restore_board() {
     this->tetrominos = this->prev_tetrominos;
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             this->board[i][j] = this->prev_board[i][j];
+        }
+    }
+}
+
+void Board::save_board() {
+    this->prev_tetrominos = this->tetrominos;
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            this->prev_board[i][j] = this->board[i][j];
         }
     }
 }
@@ -132,6 +145,7 @@ void Board::update(int rotation, int xmove, int ymove) {
     this->save_board();
     this->clean_up();
 
+    // draw the non current tetrominos first
     for (int i = 0; i < this->tetrominos.size(); i++) {
         if (this->current_tetromino_id != this->tetrominos[i].id) {
             this->draw_tetromino(this->tetrominos[i].xpos, this->tetrominos[i].ypos, this->tetrominos[i]);
@@ -155,16 +169,17 @@ void Board::remove_last_line_if_possible() {
         }
     }
 
-    // remove last line
     this->save_board();
     this->clean_up();
 
+    // remove last line
     for (int i = 1; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             this->board[i][j] = this->prev_board[i - 1][j];
         }
     }
 
+    // remove a line after the current tetromino too
     try {
         this->tetrominos[this->current_tetromino_id].ypos++;
     }
@@ -172,6 +187,10 @@ void Board::remove_last_line_if_possible() {
 }
 
 bool Board::is_won() {
+
+    if (this->game_is_over) {
+        return false;
+    }
 
     // collect the filled columns
     bool is_there_a_filled_column = false;
