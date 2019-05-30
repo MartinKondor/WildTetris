@@ -8,7 +8,7 @@
 const void rotate_matrix(int mat[5][5]) {
     for (int x = 0; x < 5 / 2; x++) {
         for (int y = x; y < 5 - 1 - x; y++) {
-            int temp = mat[x][y];
+            const int temp = mat[x][y];
   
             // move values from right to top 
             mat[x][y] = mat[y][5 - 1 - x]; 
@@ -77,7 +77,7 @@ Tetromino::Tetromino(char shape_type, int xpos, int ypos, int id)
     }
 }
 
-void Tetromino::rotate(int clockwise_n_of_90) {
+const void Tetromino::rotate(int clockwise_n_of_90) {
     if (clockwise_n_of_90 >= 0 && clockwise_n_of_90 <= 4) {
         for (int i = 0; i < clockwise_n_of_90; i++) {
             rotate_matrix(this->pixels);
@@ -89,7 +89,7 @@ void Tetromino::rotate(int clockwise_n_of_90) {
     }
 }
 
-void Tetromino::print() {
+const void Tetromino::print() {
     std::cout << "Shape: " << this->shape_type << std::endl;
     std::cout << "Rotation: " << this->rotation*90 << std::endl;
     std::cout << std::endl;

@@ -5,11 +5,11 @@
 # WildTetris
 [![version](https://img.shields.io/badge/version-prototype-red.svg)](https://github.com/MartinKondor/WildTetris)
 
-WildTetris is a simple tetris game built in C++.
+WildTetris is a simple tetris game built in C++ for windows.
 
 ## Usage
 
-Build 
+Build
 
 ```shell
 make build

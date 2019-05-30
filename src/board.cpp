@@ -18,7 +18,7 @@ Board::Board() {
 
 }
 
-void Board::throw_new_tetromino() {
+const void Board::throw_new_tetromino() {
     srand(time(NULL));
 
     // choose a random shape with random rotation
@@ -28,7 +28,7 @@ void Board::throw_new_tetromino() {
     this->current_tetromino_id = this->store_tetromino(BOARD_WIDTH / 2 - 1, 0, choosen_shape, choosen_rotation);
 }
 
-int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation) {
+const int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation) {
     if (!this->is_free_block(xcoord, ycoord)) {
         // probably it's spawning on filled coordinates
 
@@ -51,7 +51,7 @@ int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation
     return t.id;
 }
 
-bool Board::is_free_block(int xcoord, int ycoord) {
+const bool Board::is_free_block(int xcoord, int ycoord) {
     if (this->board[ycoord][xcoord] == 1 ||
         xcoord >= BOARD_WIDTH || ycoord >= BOARD_HEIGHT ||
         xcoord < 0 || ycoord < 0) {
@@ -60,21 +60,22 @@ bool Board::is_free_block(int xcoord, int ycoord) {
     return true;
 }
 
-void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &tetromino) {
+const void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &tetromino) {
     Pair pads = tetromino.get_paddings();
 
-    int xpad = pads[0],
+    const int xpad = pads[0],
         ypad = pads[1];
 
     for (int i = 0; i < 5; i++) {  // place tetromino to the board
         for (int j = 0; j < 5; j++) {
             if (tetromino.pixels[i][j] == 1) {
-                int newx = xcoord + j - xpad,
+                const int newx = xcoord + j - xpad,
                     newy = ycoord + i - ypad;
 
                 if (this->is_free_block(newx, newy)) {
                     this->board[newy][newx] = 1;
                 } else {
+
                     // allow the non current box to go beyond height
                     // this occurs when we remove the last line
                     if (this->current_tetromino_id != tetromino.id) {
@@ -94,7 +95,7 @@ void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &tetromino) {
     }
 }
 
-void Board::restore_board() {
+const void Board::restore_board() {
     this->tetrominos = this->prev_tetrominos;
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
@@ -103,7 +104,7 @@ void Board::restore_board() {
     }
 }
 
-void Board::save_board() {
+const void Board::save_board() {
     this->prev_tetrominos = this->tetrominos;
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
@@ -112,7 +113,7 @@ void Board::save_board() {
     }
 }
 
-void Board::clean_up() {
+const void Board::clean_up() {
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             this->board[i][j] = 0;
@@ -120,7 +121,7 @@ void Board::clean_up() {
     }
 }
 
-void Board::print() {
+const void Board::print() {
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             if (this->board[i][j] == 1) {
@@ -136,20 +137,11 @@ void Board::print() {
     rlutil::resetColor();
 }
 
-int Board::get_new_tetromino_id() {
+const int Board::get_new_tetromino_id() {
     return this->tetromino_id++;
 }
 
-Tetromino Board::get_tetromino_by_id(int id) {
-    for (int i = 0; i < this->tetrominos.size(); i++) {
-        if (this->tetrominos[i].id == id) {
-            return this->tetrominos[i];
-        }
-    }
-    return Tetromino('Q', -1, -1, -1);
-}
-
-void Board::update(int rotation, int xmove, int ymove) {
+const void Board::update(int rotation, int xmove, int ymove) {
     this->save_board();
     this->clean_up();
 
@@ -170,7 +162,7 @@ void Board::update(int rotation, int xmove, int ymove) {
     catch (const std::out_of_range &oor) {}
 }
 
-void Board::remove_last_line_if_possible() {
+const void Board::remove_last_line_if_possible() {
     for (int i = 0; i < BOARD_WIDTH; i++) {
         if (this->board[BOARD_HEIGHT - 1][i] == 0) {
             return;
@@ -196,26 +188,25 @@ void Board::remove_last_line_if_possible() {
     catch (const std::out_of_range &oor) {}
 }
 
-bool Board::is_won() {
+const bool Board::is_won() {
 
     if (this->game_is_over) {
         return false;
     }
 
-    // collect the filled columns
     bool is_there_a_filled_column = false;
 
     for (int j = 0; j < BOARD_WIDTH; j++) {
-        int sum = 0;
-        
+        bool forthis_one_column = true;
         for (int i = 0; i < BOARD_HEIGHT; i++) {
-            sum += this->board[i][j];
+            if (this->board[i][j] == 0) {
+                forthis_one_column = false;
+                continue;
+            }
         }
-
-        if (sum == BOARD_HEIGHT) {
+        if (forthis_one_column) {
             is_there_a_filled_column = true;
-            break;
-        } 
+        }
     }
 
     if (is_there_a_filled_column) {

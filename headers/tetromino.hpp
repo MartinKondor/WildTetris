@@ -16,7 +16,8 @@ Also the object itself contains the rotation of the Tetromino.
 
 const char SHAPE_TYPES[5] = {'L', 'Z', 'T', 'S', 'I'};
 
-class Tetromino { public:
+class Tetromino {
+    public:
 
     /**
     * Container for the pixels of an element
@@ -34,7 +35,6 @@ class Tetromino { public:
     int xpos;
     int ypos;
     int id;
-    std::vector<Pair> filled_coordinates;
     int color;
 
     Tetromino(char shape_type, int xpos, int ypos, int id);
@@ -42,12 +42,8 @@ class Tetromino { public:
     /**
      * Rotate the pixels array to the given degree
      */
-    void rotate(int clockwise_n_of_90);
-    void print();
-
-    /**
-    * Retrun an array with the x and y paddings to the first 1
-    */
+    const void rotate(int clockwise_n_of_90);
+    const void print();
     Pair get_paddings();
 };
 

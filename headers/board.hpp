@@ -10,14 +10,15 @@ and the collusion detection takes place.
 #include "tetromino.hpp"
 
 #define BOARD_HEIGHT 14  // in blocks
-#define BOARD_WIDTH 9
+#define BOARD_WIDTH 10
 
 
-class Board { public:
-    std::vector<Tetromino> tetrominos;
-    std::vector<Tetromino> prev_tetrominos;
+class Board {
+    public:
     int prev_board[BOARD_HEIGHT][BOARD_WIDTH];
     int board[BOARD_HEIGHT][BOARD_WIDTH];
+    std::vector<Tetromino> tetrominos;
+    std::vector<Tetromino> prev_tetrominos;
     int tetromino_id;
     int score;
     int game_is_over;
@@ -28,12 +29,12 @@ class Board { public:
     int current_tetromino_id;
 
     Board();
-    void print();
+    const void print();
 
     /**
     * Throw a new playable tetromino from the top
     */
-    void throw_new_tetromino();
+    const void throw_new_tetromino();
 
     /**
      * Place tetromino to the board from it's first filled element
@@ -46,39 +47,34 @@ class Board { public:
      *
      * returns the tetromino's id
      */
-    int store_tetromino(int xcoord, int ycoord, char shape_type, int rotation);
+    const int store_tetromino(int xcoord, int ycoord, char shape_type, int rotation);
 
     /**
     * Determine if the block is free from tetrominos
     */
-    bool is_free_block(int xcoord, int ycoord);
-    void restore_board();
+    const bool is_free_block(int xcoord, int ycoord);
+    const void restore_board();
 
     /**
     * Fills the board with 0s
     */
-    void clean_up();
-    int get_new_tetromino_id();
+    const void clean_up();
+    const int get_new_tetromino_id();
 
     /**
     * This is where the current tetromnio starts to fall
     */
-    void update(int rotation, int xmove, int ymove);
-
-    /**
-    * Seaches for and retruns the given id'd tetromino
-    */
-    Tetromino get_tetromino_by_id(int id);
-    void draw_tetromino(int xcoord, int ycoord, Tetromino &t);
-    void save_board();
-    void remove_last_line_if_possible();
+    const void update(int rotation, int xmove, int ymove);
+    const void draw_tetromino(int xcoord, int ycoord, Tetromino &t);
+    const void save_board();
+    const void remove_last_line_if_possible();
 
     /**
      * Checks if the player can continue or lose the game
      * false = losing
      * true = continue
      */
-    bool is_won();
+    const bool is_won();
 };
 
 #endif
