@@ -141,11 +141,8 @@ void Board::update(int rotation, int xmove, int ymove) {
 
 void Board::throw_new_tetromino() {
     // choose a random shape with random rotation
-    /*
     srand(time(NULL));
-    int id = this->store_tetromino(1, 0, SHAPE_TYPES[rand() % 5], rand() % 4);
-    */
-    int id = this->store_tetromino(0, 0, 'I', 0);
+    int id = this->store_tetromino(0, 0, SHAPE_TYPES[rand() % 5], rand() % 4);
     this->current_tetromino_id = id;
 }
 

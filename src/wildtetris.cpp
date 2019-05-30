@@ -19,32 +19,53 @@ using std::cout;
 using std::endl;
 
 
+void showinfo() {
+    cout << endl;
+    cout << "Keys:" << endl;
+    cout << "(R)\tRotate" << endl;
+    cout << "(E)\tExit" << endl;
+    cout << endl;
+}
+
+
 int main(const int argc, const char** args) {
-    Board board = Board();
+    Board* board = new Board;
+    int rotation = 0;
+    int xmove = 0;
+    int ymove = 1;
 
     // throw the first tetromino
-    board.throw_new_tetromino();
+    board->throw_new_tetromino();
 
-    int iter = 0,
-        rotation = 0,
-        xmove = 0,
-        ymove = 1;
+    while (true) {
+        Sleep(200);
 
-    while (iter < 6) {
-        // Sleep(500);
+        // showing board and info on screen
+        system("cls");
+        showinfo();
+        board->print();
 
-        board.print();
-        cout << endl;
-
-        board.remove_last_line_if_possible();
-        
-        if (!board.is_won()) {
+        // check win conditions
+        if (!board->is_won()) {
             cout << "Game over";
             exit(0);
         }
 
-        board.update(rotation, xmove, ymove);
-        iter++;
+        // rotation key
+        if (GetKeyState('R') & 0x8000) {
+            rotation++;
+        }
+
+        // exit key
+        if (GetKeyState('E') & 0x8000) {
+            break;
+        }
+
+        board->remove_last_line_if_possible();
+        board->update(rotation, xmove, ymove);
     }
+
+    delete board;
+
     return 0;
 }

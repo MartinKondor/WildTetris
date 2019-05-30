@@ -9,8 +9,8 @@ and the collusion detection takes place.
 
 #include "tetromino.hpp"
 
-#define BOARD_HEIGHT 8  // in blocks
-#define BOARD_WIDTH 3
+#define BOARD_HEIGHT 10  // in blocks
+#define BOARD_WIDTH 5
 
 
 class Board { public:
