@@ -1,6 +1,5 @@
 <p align="center">
-    <img src="https://github.com/MartinKondor/WildTetris/blob/master/docs/logo.png" width="300"
-    style="box-shadow: 1px 2px 50px rgb(70, 70, 70);">
+    <img src="docs/images/readme.png" width="150" style="box-shadow: 1px 2px 50px rgb(70, 70, 70);">
 </p>
 
 # WildTetris
