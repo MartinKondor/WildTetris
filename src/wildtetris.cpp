@@ -3,6 +3,9 @@
 #include <vector>
 #include <stdexcept>
 #include <time.h>
+#include <windows.h>
+
+#include "rlutil.h"
 
 struct Pair {
     int pair[2];
@@ -18,8 +21,7 @@ struct Pair {
 using std::cout;
 using std::endl;
 
-
-void showinfo(const Board &board) {
+const void showinfo(const Board &board) {
     cout << endl;
     cout << "Keys:" << endl;
     cout << "(R)\tRotate" << endl;
@@ -29,25 +31,25 @@ void showinfo(const Board &board) {
     cout << endl;
 }
 
-int handle_keys(int &xmove, int &ymove, int &rotation) {
-    // rotation key
-    if (GetKeyState('R') & 0x8000) {
-        rotation++;
-    }
+const int handle_keys(int &xmove, int &ymove, int &rotation) {
     // exit key
-    if (GetKeyState('E') & 0x8000) {
+    if (GetAsyncKeyState('E') & 0x8000) {
         return 1;
     }
-    if (GetKeyState(VK_DOWN) & 0x8000) {
+    // rotation key
+    if (GetAsyncKeyState('R') & 0x8000) {
+        rotation++;
+    }
+    if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
         ymove++;
     }
-    if (GetKeyState(VK_UP) & 0x8000) {
+    if (GetAsyncKeyState(VK_UP) & 0x8000) {
         ymove--;
     }
-    if (GetKeyState(VK_LEFT) & 0x8000) {
+    if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
         xmove--;
     }
-    if (GetKeyState(VK_RIGHT) & 0x8000) {
+    if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
         xmove++;
     }
     return 0;
@@ -55,6 +57,8 @@ int handle_keys(int &xmove, int &ymove, int &rotation) {
 
 
 int main(const int argc, const char** args) {
+    rlutil::saveDefaultColor();
+
     Board board = Board();
     int rotation = 0;
     int xmove = 0;
@@ -65,9 +69,11 @@ int main(const int argc, const char** args) {
 
     while (true) {
         Sleep(200);
-        system("cls");
+        if (handle_keys(xmove, ymove, rotation) == 1) {
+            break;
+        }
 
-        // showing board and info on screen
+        system("\"cls\"");
         showinfo(board);
         board.print();
 
@@ -77,12 +83,12 @@ int main(const int argc, const char** args) {
             exit(0);
         }
 
-        if (handle_keys(xmove, ymove, rotation) == 1) {
-            break;
-        }
-
         board.update(rotation, xmove, ymove);
         board.remove_last_line_if_possible();
+
+        xmove = 0;
+        ymove = 1;
+        rotation = 0;
     }
 
     return 0;

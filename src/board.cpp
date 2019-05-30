@@ -25,7 +25,7 @@ void Board::throw_new_tetromino() {
     const char choosen_shape = SHAPE_TYPES[rand() % 5];
     const int choosen_rotation = rand() % 4;
 
-    this->current_tetromino_id = this->store_tetromino(0, 0, choosen_shape, choosen_rotation);
+    this->current_tetromino_id = this->store_tetromino(BOARD_WIDTH / 2 - 1, 0, choosen_shape, choosen_rotation);
 }
 
 int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation) {
@@ -52,7 +52,9 @@ int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation
 }
 
 bool Board::is_free_block(int xcoord, int ycoord) {
-    if (this->board[ycoord][xcoord] == 1 || xcoord >= BOARD_WIDTH || ycoord >= BOARD_HEIGHT) {
+    if (this->board[ycoord][xcoord] == 1 ||
+        xcoord >= BOARD_WIDTH || ycoord >= BOARD_HEIGHT ||
+        xcoord < 0 || ycoord < 0) {
         return false;
     }
     return true;
@@ -90,7 +92,6 @@ void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &tetromino) {
             }
         }
     }
-
 }
 
 void Board::restore_board() {
@@ -122,10 +123,17 @@ void Board::clean_up() {
 void Board::print() {
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
-            std::cout << this->board[i][j] << "  ";
+            if (this->board[i][j] == 1) {
+                rlutil::setBackgroundColor(8);
+            } else {
+                rlutil::setBackgroundColor(15);
+            }
+            std::cout << "  ";
+            rlutil::resetColor();
         }
         std::cout << std::endl;
     }
+    rlutil::resetColor();
 }
 
 int Board::get_new_tetromino_id() {
@@ -178,6 +186,8 @@ void Board::remove_last_line_if_possible() {
             this->board[i][j] = this->prev_board[i - 1][j];
         }
     }
+
+    this->score += 1;
 
     // remove a line after the current tetromino too
     try {

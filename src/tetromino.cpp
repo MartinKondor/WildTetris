@@ -2,7 +2,7 @@
 
 
 /**
- * An Inplace function to rotate a NxN matrix 
+ * An Inplace function to rotate a NxN matrix
  * by 90 degrees in anti-clockwise direction
  */
 const void rotate_matrix(int mat[5][5]) {
@@ -37,6 +37,7 @@ Tetromino::Tetromino(char shape_type, int xpos, int ypos, int id)
     this->xpos = xpos;
     this->ypos = ypos;
     this->id = id;
+    this->color = 16;
 
     switch (shape_type) {
         case 'Z':

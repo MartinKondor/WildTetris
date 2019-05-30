@@ -35,6 +35,7 @@ class Tetromino { public:
     int ypos;
     int id;
     std::vector<Pair> filled_coordinates;
+    int color;
 
     Tetromino(char shape_type, int xpos, int ypos, int id);
 
