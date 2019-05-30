@@ -6,45 +6,54 @@ Board::Board() {
     this->tetromino_id = 0;
     this->current_tetromino_id = 0;
 
+    // filling the boards with 0s
     for (int i = 0; i < BOARD_HEIGHT; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             this->board[i][j] = 0;
             this->prev_board[i][j] = 0;
         }
     }
+
 }
 
-void Board::save_board() {
-    this->prev_tetrominos = this->tetrominos;
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            this->prev_board[i][j] = this->board[i][j];
-        }
-    }
+void Board::throw_new_tetromino() {
+    srand(time(NULL));
+
+    // choose a random shape with random rotation
+    const char choosen_shape = SHAPE_TYPES[rand() % 5];
+    const int choosen_rotation = rand() % 4;
+
+    this->current_tetromino_id = this->store_tetromino(0, 0, choosen_shape, choosen_rotation);
 }
 
-void Board::restore_board() {
-    this->tetrominos = this->prev_tetrominos;
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            this->board[i][j] = this->prev_board[i][j];
-        }
-    }
-}
-
-int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation) {
+int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation) {
     if (!this->is_free_block(xcoord, ycoord, -1)) {
         std::cout << "(" << ycoord << ", " << xcoord << ") is not a free position" << std::endl;
-        //exit(1);
+        exit(1);
     }
 
     // creating and rotating tetromino object
     Tetromino t = Tetromino(shape_type, xcoord, ycoord, this->get_new_tetromino_id());
-    t.rotate(n_of_90_degree_rotation);
+    t.rotate(rotation);
 
     this->draw_tetromino(xcoord, ycoord, t);
     this->tetrominos.push_back(t);
     return t.id;
+}
+
+bool Board::is_free_block(int xcoord, int ycoord, int tetromino_id) {
+    if (this->board[ycoord][xcoord] == 1 || xcoord >= BOARD_WIDTH || ycoord >= BOARD_HEIGHT) {
+
+        if (this->current_tetromino_id != tetromino_id && this->board[ycoord][xcoord] == 0) {
+            return true;
+        }
+
+        this->restore_board();  // abord changes on the board
+        this->throw_new_tetromino();  // throw a new playable tetromino
+
+        return false;
+    }
+    return true;
 }
 
 void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) {
@@ -71,23 +80,23 @@ void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &t) {
 
 }
 
-bool Board::is_free_block(int xcoord, int ycoord, int tetromino_id) {
-    if (this->board[ycoord][xcoord] == 1 ||
-        xcoord >= BOARD_WIDTH ||
-        ycoord >= BOARD_HEIGHT) {
-
-        if (this->current_tetromino_id != tetromino_id && this->board[ycoord][xcoord] == 0) {
-            return true;
+void Board::save_board() {
+    this->prev_tetrominos = this->tetrominos;
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            this->prev_board[i][j] = this->board[i][j];
         }
-
-        this->restore_board();  // abord changes on the board
-        this->throw_new_tetromino();  // throw a new playable tetromino
-
-        return false;
     }
-    return true;
 }
 
+void Board::restore_board() {
+    this->tetrominos = this->prev_tetrominos;
+    for (int i = 0; i < BOARD_HEIGHT; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            this->board[i][j] = this->prev_board[i][j];
+        }
+    }
+}
 
 void Board::clean_up() {
     for (int i = 0; i < BOARD_HEIGHT; i++) {
@@ -139,13 +148,6 @@ void Board::update(int rotation, int xmove, int ymove) {
     catch (const std::out_of_range &oor) {}
 }
 
-void Board::throw_new_tetromino() {
-    // choose a random shape with random rotation
-    srand(time(NULL));
-    int id = this->store_tetromino(0, 0, SHAPE_TYPES[rand() % 5], rand() % 4);
-    this->current_tetromino_id = id;
-}
-
 void Board::remove_last_line_if_possible() {
     for (int i = 0; i < BOARD_WIDTH; i++) {
         if (this->board[BOARD_HEIGHT - 1][i] == 0) {
@@ -170,6 +172,7 @@ void Board::remove_last_line_if_possible() {
 }
 
 bool Board::is_won() {
+
     // collect the filled columns
     bool is_there_a_filled_column = false;
 

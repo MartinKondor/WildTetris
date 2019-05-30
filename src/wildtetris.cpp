@@ -29,24 +29,24 @@ void showinfo() {
 
 
 int main(const int argc, const char** args) {
-    Board* board = new Board;
+    Board board = Board();
     int rotation = 0;
     int xmove = 0;
     int ymove = 1;
 
     // throw the first tetromino
-    board->throw_new_tetromino();
+    board.throw_new_tetromino();
 
     while (true) {
         Sleep(200);
+        system("cls");
 
         // showing board and info on screen
-        system("cls");
         showinfo();
-        board->print();
+        board.print();
 
         // check win conditions
-        if (!board->is_won()) {
+        if (!board.is_won()) {
             cout << "Game over";
             exit(0);
         }
@@ -61,11 +61,9 @@ int main(const int argc, const char** args) {
             break;
         }
 
-        board->remove_last_line_if_possible();
-        board->update(rotation, xmove, ymove);
+        board.update(rotation, xmove, ymove);  // fix
+        board.remove_last_line_if_possible();
     }
-
-    delete board;
 
     return 0;
 }

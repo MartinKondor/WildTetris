@@ -81,7 +81,6 @@ void Tetromino::rotate(int clockwise_n_of_90) {
         for (int i = 0; i < clockwise_n_of_90; i++) {
             rotate_matrix(this->pixels);
         }
-
         this->rotation = clockwise_n_of_90;
     } else {
         std::cout << "cannot rotate matrix by " << clockwise_n_of_90*90 << " degree" << std::endl;

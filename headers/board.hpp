@@ -26,12 +26,9 @@ class Board { public:
     int current_tetromino_id;
 
     Board();
-    
-    /**
-    * Determine if the block is free from tetrominos
-    */
-    bool is_free_block(int xcoord, int ycoord, int tetromino_id);
-    
+    void print();
+    void throw_new_tetromino();
+
     /**
      * Place tetromino to the board from it's first filled element
      *
@@ -43,8 +40,13 @@ class Board { public:
      *
      * returns the tetromino's id
      */
-    int store_tetromino(int xcoord, int ycoord, char shape_type, int n_of_90_degree_rotation);
-    void print();
+    int store_tetromino(int xcoord, int ycoord, char shape_type, int rotation);
+
+    /**
+    * Determine if the block is free from tetrominos
+    */
+    bool is_free_block(int xcoord, int ycoord, int tetromino_id);
+    void restore_board();
 
     /**
     * Fills the board with 0s
@@ -62,9 +64,7 @@ class Board { public:
     */
     Tetromino get_tetromino_by_id(int id);
     void draw_tetromino(int xcoord, int ycoord, Tetromino &t);
-    void throw_new_tetromino();
     void save_board();
-    void restore_board();
     void remove_last_line_if_possible();
 
     /**
