@@ -25,7 +25,7 @@ const void Board::throw_new_tetromino() {
     const char choosen_shape = SHAPE_TYPES[rand() % 5];
     const int choosen_rotation = rand() % 4;
 
-    this->current_tetromino_id = this->store_tetromino(BOARD_WIDTH / 2 - 1, 0, choosen_shape, choosen_rotation);
+    this->current_tetromino_id = this->store_tetromino(0, 0, choosen_shape, choosen_rotation);
 }
 
 const int Board::store_tetromino(int xcoord, int ycoord, char shape_type, int rotation) {
@@ -64,7 +64,7 @@ const void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &tetromino) {
     Pair pads = tetromino.get_paddings();
 
     const int xpad = pads[0],
-        ypad = pads[1];
+              ypad = pads[1];
 
     for (int i = 0; i < 5; i++) {  // place tetromino to the board
         for (int j = 0; j < 5; j++) {
@@ -75,7 +75,14 @@ const void Board::draw_tetromino(int xcoord, int ycoord, Tetromino &tetromino) {
                 if (this->is_free_block(newx, newy)) {
                     this->board[newy][newx] = 1;
                 } else {
-
+    
+                    // let the tetrominos slip on the slide when they are colliding with the wall
+                    if ((newx == BOARD_WIDTH || newx == -1) && this->current_tetromino_id == tetromino.id && newy < BOARD_HEIGHT) {
+                       this->restore_board();
+                       this->update(0, 0, 1);
+                       return; 
+                    }
+                
                     // allow the non current box to go beyond height
                     // this occurs when we remove the last line
                     if (this->current_tetromino_id != tetromino.id) {
