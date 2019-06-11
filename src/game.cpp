@@ -46,7 +46,9 @@ const void Game::start() {
             in_pause = true;
         }
 
-        system("\"cls\"");
+        cout.flush();
+        system("cls");
+        
         this->board.update(this->rotation, this->xmove, this->ymove);
         this->board.remove_last_line_if_possible();
         this->show();
