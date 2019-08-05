@@ -46,8 +46,12 @@ const void Game::start() {
             in_pause = true;
         }
 
-        cout.flush();
-        system("cls");
+        // Clear the screen
+        COORD position;
+        HANDLE hout = GetStdHandle(STD_OUTPUT_HANDLE);
+        position.X = 0;
+        position.Y = 0;
+        SetConsoleCursorPosition(hout, position);
         
         this->board.update(this->rotation, this->xmove, this->ymove);
         this->board.remove_last_line_if_possible();
